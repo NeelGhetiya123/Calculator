@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neel Calculator — Crypto Price & INR Calculator</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Poppins', 'ui-sans-serif', 'system-ui'],
+            display: ['Poppins', 'Inter', 'ui-sans-serif', 'system-ui'],
+          },
+          colors: {
+            night: '#0F172A', // requested dark theme base
+            neonG: '#22d3ee', // cyan-400
+            neonB: '#84cc16', // lime-500
+          },
+          boxShadow: {
+            neon: '0 0 20px rgba(34,211,238,0.35), 0 0 40px rgba(132,204,22,0.25)',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' },
+            },
+            glow: {
+              '0%, 100%': { boxShadow: '0 0 0 rgba(34,211,238,0.0)' },
+              '50%': { boxShadow: '0 0 28px rgba(34,211,238,0.45)' },
+            },
+            pulseY: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+          },
+          animation: {
+            float: 'float 6s ease-in-out infinite',
+            glow: 'glow 3s ease-in-out infinite',
+            pulseY: 'pulseY 4s ease-in-out infinite',
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    :root { --bg: #0F172A; }
+    html { scroll-behavior: smooth; }
+    /* Frosted glass helper */
+    .glass { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(14px); }
+    .glass-strong { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(18px); }
+    .text-gradient { background: linear-gradient(90deg, #22d3ee, #84cc16); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .btn-glow { box-shadow: 0 0 0 rgba(34,211,238,0); }
+    .btn-glow:hover { box-shadow: 0 0 25px rgba(34,211,238,0.45), 0 0 50px rgba(132,204,22,0.35); }
+    /* Hero SVG waves */
+    .hero-wave { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+  </style>
+</head>
+<body class="bg-night text-slate-100 font-sans antialiased">
+  <!-- Background gradient blur orbs -->
+  <div class="fixed -top-40 -left-40 w-[520px] h-[520px] rounded-full blur-3xl opacity-30 pointer-events-none" style="background: radial-gradient( circle at 30% 30%, #22d3ee55, transparent 60% )"></div>
+  <div class="fixed -bottom-40 -right-40 w-[520px] h-[520px] rounded-full blur-3xl opacity-30 pointer-events-none" style="background: radial-gradient( circle at 70% 70%, #84cc1655, transparent 60% )"></div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50">
+    <div class="glass-strong mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 rounded-b-2xl shadow-neon">
+      <div class="flex items-center justify-between">
+        <a href="#home" class="flex items-center gap-2 group">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-neonG to-neonB flex items-center justify-center animate-glow">
+            <!-- Simple cube logo -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="opacity-90">
+              <path d="M3 7l9-5 9 5-9 5-9-5Z" stroke="white" stroke-width="1.2"/>
+              <path d="M3 7v10l9 5V12L3 7Z" stroke="white" stroke-width="1.2"/>
+              <path d="M21 7v10l-9 5V12l9-5Z" stroke="white" stroke-width="1.2"/>
+            </svg>
+          </div>
+          <span class="font-display text-lg font-semibold tracking-wide">Neel Calculator</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm">
+          <a href="#home" class="hover:text-cyan-300 transition">Home</a>
+          <a href="#calculator" class="hover:text-cyan-300 transition">Calculator</a>
+          <a href="#about" class="hover:text-cyan-300 transition">About</a>
+        </nav>
+        <a href="#calculator" class="md:hidden inline-flex items-center gap-2 text-xs px-3 py-2 rounded-xl bg-gradient-to-r from-neonG to-neonB text-night font-semibold btn-glow transition duration-500">Calc</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="home" class="relative min-h-[88vh] flex items-center">
+    <div class="absolute inset-0 -z-10">
+      <!-- Animated gradient blob -->
+      <svg class="absolute -top-20 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] opacity-20 animate-float" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(300,300)">
+          <path d="M120,-169C156,-146,189,-121,207,-87C226,-54,230,-12,221,24C212,60,191,90,165,115C139,140,108,160,74,171C40,182,2,184,-36,184C-74,184,-111,183,-143,166C-176,149,-204,117,-221,81C-238,44,-244,4,-233,-31C-222,-67,-193,-98,-162,-126C-132,-154,-100,-180,-63,-195C-25,-210,18,-214,58,-205C97,-196,134,-175,120,-169Z" fill="url(#grad)"/>
+          <defs>
+            <linearGradient id="grad" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#22d3ee"/>
+              <stop offset="100%" stop-color="#84cc16"/>
+            </linearGradient>
+          </defs>
+        </g>
+      </svg>
+      <!-- Bottom waves -->
+      <svg class="absolute bottom-0 left-0 w-full opacity-50" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path fill="#22d3ee" fill-opacity="0.18" d="M0,96L48,106.7C96,117,192,139,288,165.3C384,192,480,224,576,234.7C672,245,768,235,864,218.7C960,203,1056,181,1152,176C1248,171,1344,181,1392,186.7L1440,192L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+        <path fill="#84cc16" fill-opacity="0.10" d="M0,224L60,229.3C120,235,240,245,360,256C480,267,600,277,720,272C840,267,960,245,1080,224C1200,203,1320,181,1380,170.7L1440,160L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+      </svg>
+    </div>
+
+    <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 text-center">
+      <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
+        <span class="text-gradient">Track Crypto Prices in INR</span>
+      </h1>
+      <p class="mt-4 text-slate-300 max-w-2xl mx-auto">The ultimate crypto calculator for instant conversions and real-time price tracking.</p>
+      <div class="mt-8">
+        <a href="#calculator" class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-neonG to-neonB text-night font-semibold tracking-wide btn-glow transition duration-500 ease-in-out hover:scale-105">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14m0 0l-6-6m6 6l6-6" stroke="#0f172a" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Go to Calculator
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Prices Grid -->
+  <section class="relative py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <h2 class="font-display text-2xl sm:text-3xl font-bold mb-8">Popular Crypto Prices (INR)</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Card Template -->
+        <div class="glass rounded-2xl p-5 transition duration-500 ease-in-out hover:scale-105 hover:shadow-neon">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-400 to-cyan-400 flex items-center justify-center">
+              <!-- BTC icon -->
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" opacity=".6"/><path d="M13.5 6.5c1.9.2 3 1.2 3 2.6 0 1.3-1 2.2-2.6 2.5m-2.5-5.1H9m2.4 0V5m0 1.5v1.5m0 0H9m2.4 0c2 .2 3.1 1.1 3.1 2.5s-1.2 2.4-3.1 2.6M9 9.5h2.4m0 0v1.5m0 0H9m2.4 0V13m0 0H9" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <p class="text-sm text-slate-400">Bitcoin</p>
+              <p class="text-lg font-semibold">BTC · <span id="price-card-btc">₹63,00,000</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-5 transition duration-500 ease-in-out hover:scale-105 hover:shadow-neon">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-400 to-fuchsia-400 flex items-center justify-center">
+              <!-- ETH icon -->
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3l6 9-6 3-6-3 6-9Z" stroke="white" opacity=".75"/><path d="M12 21l-6-9 6 3 6-3-6 9Z" stroke="white" opacity=".6"/></svg>
+            </div>
+            <div>
+              <p class="text-sm text-slate-400">Ethereum</p>
+              <p class="text-lg font-semibold">ETH · <span id="price-card-eth">₹3,20,000</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-5 transition duration-500 ease-in-out hover:scale-105 hover:shadow-neon">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-400 to-sky-400 flex items-center justify-center">
+              <!-- USDT icon -->
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" opacity=".6"/><path d="M6 8h12M9 8a3 3 0 016 0m-3 0v8" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <p class="text-sm text-slate-400">Tether</p>
+              <p class="text-lg font-semibold">USDT · <span id="price-card-usdt">₹83.50</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-5 transition duration-500 ease-in-out hover:scale-105 hover:shadow-neon">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-400 to-pink-400 flex items-center justify-center">
+              <!-- DOGE icon -->
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="white" opacity=".6"/><path d="M8 7h8m-4 0v10m-3 0h6" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <p class="text-sm text-slate-400">Dogecoin</p>
+              <p class="text-lg font-semibold">DOGE · <span id="price-card-doge">₹11.32</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Calculator -->
+  <section id="calculator" class="relative py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mb-8 flex items-end justify-between gap-4">
+        <div>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold">Crypto ↔ INR Calculator</h2>
+          <p class="text-slate-400">Two-way, real-time conversions using demo prices.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Crypto to INR -->
+        <div class="glass rounded-2xl p-6 lg:p-8 transition duration-500 ease-in-out hover:scale-105 hover:shadow-neon">
+          <h3 class="font-semibold text-lg mb-4">Crypto → INR</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+            <div class="sm:col-span-1">
+              <label class="text-sm text-slate-300">Select Coin</label>
+              <select id="c2i-coin" class="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-cyan-400 transition">
+                <option value="BTC">BTC • Bitcoin</option>
+                <option value="ETH">ETH • Ethereum</option>
+                <option value="USDT">USDT • Tether</option>
+                <option value="DOGE">DOGE • Dogecoin</option>
+              </select>
+            </div>
+            <div class="sm:col-span-1">
+              <label class="text-sm text-slate-300">Amount (Crypto)</label>
+              <input id="c2i-amount" type="number" step="any" placeholder="e.g. 0.25" class="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-cyan-400 transition" />
+            </div>
+            <div class="sm:col-span-1">
+              <label class="text-sm text-slate-300">Value (INR)</label>
+              <input id="c2i-result" type="text" readonly class="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-lime-400 transition font-semibold" />
+            </div>
+          </div>
+        </div>
+
+        <!-- INR to Crypto -->
+        <div class="glass rounded-2xl p-6 lg:p-8 transition duration-500 ease-in-out hover:scale-105 hover:shadow-neon">
+          <h3 class="font-semibold text-lg mb-4">INR → Crypto</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+            <div class="sm:col-span-1">
+              <label class="text-sm text-slate-300">Select Coin</label>
+              <select id="i2c-coin" class="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-cyan-400 transition">
+                <option value="BTC">BTC • Bitcoin</option>
+                <option value="ETH">ETH • Ethereum</option>
+                <option value="USDT">USDT • Tether</option>
+                <option value="DOGE">DOGE • Dogecoin</option>
+              </select>
+            </div>
+            <div class="sm:col-span-1">
+              <label class="text-sm text-slate-300">Amount (INR)</label>
+              <input id="i2c-amount" type="number" step="any" placeholder="e.g. 10000" class="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-cyan-400 transition" />
+            </div>
+            <div class="sm:col-span-1">
+              <label class="text-sm text-slate-300">Value (Crypto)</label>
+              <input id="i2c-result" type="text" readonly class="mt-1 w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-lime-400 transition font-semibold" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="relative py-16">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      <div class="glass rounded-3xl p-8 md:p-12 grid md:grid-cols-5 gap-8 items-center transition duration-500 ease-in-out hover:scale-105 hover:shadow-neon">
+        <div class="md:col-span-3">
+          <h3 class="font-display text-2xl font-bold mb-3">About this Tool</h3>
+          <p class="text-slate-300">Neel Calculator is your ultimate tool for tracking cryptocurrency prices and performing instant conversions between crypto assets and Indian Rupees (INR). With our intuitive interface and real-time data simulation, you can make informed decisions about your digital asset investments.</p>
+          <div class="mt-5 flex flex-wrap gap-3">
+          </div>
+        </div>
+        <div class="md:col-span-2">
+          <div class="rounded-2xl h-48 sm:h-56 md:h-full bg-gradient-to-tr from-neonG/20 to-neonB/20 border border-white/10 flex items-center justify-center animate-pulseY">
+            <span class="text-gradient font-bold text-xl">Neel Calculator</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="relative py-10">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="glass rounded-2xl px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-slate-400 text-sm">Made with <span class="text-gradient font-semibold"><a href="https://github.com/NeelGhetiya123">Neel Patel ❤</a></span> by <span class="font-semibold">Neel Calculator</span> | ©2025 All rights reserved</p>
+        <div class="flex items-center gap-4">
+          <a href="https://github.com/NeelGhetiya123" class="p-2 rounded-xl bg-white/5 border border-white/10 transition hover:scale-105 hover:shadow-neon" aria-label="GitHub">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-slate-200"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.48 2 2 6.7 2 12.4c0 4.6 2.9 8.5 6.9 9.9.5.1.7-.2.7-.5v-2c-2.8.6-3.4-1.2-3.4-1.2-.5-1.3-1.2-1.6-1.2-1.6-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.8 2.1 2.9 1.5.1-.8.4-1.3.7-1.6-2.2-.3-4.6-1.2-4.6-5.3 0-1.2.4-2.1 1.1-2.9-.1-.3-.5-1.5.1-3.1 0 0 .9-.3 2.9 1.1a9.7 9.7 0 015.4 0c2-1.4 2.9-1.1 2.9-1.1.7 1.6.2 2.8.1 3.1.7.8 1.1 1.7 1.1 2.9 0 4.2-2.4 5-4.6 5.3.4.4.7 1 .7 2v3c0 .3.2.6.7.5 4-1.4 6.9-5.3 6.9-9.9C22 6.7 17.5 2 12 2z"/></svg>
+          </a>
+          <a href="#" class="p-2 rounded-xl bg-white/5 border border-white/10 transition hover:scale-105 hover:shadow-neon" aria-label="YouTube">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-slate-200"><path d="M23.5 6.2a4 4 0 00-2.8-2.8C18.7 3 12 3 12 3s-6.7 0-8.7.4A4 4 0 00.5 6.2 41 41 0 000 12a41 41 0 00.5 5.8 4 4 0 002.8 2.8C5.3 21 12 21 12 21s6.7 0 8.7-.4a4 4 0 002.8-2.8A41 41 0 0024 12a41 41 0 00-.5-5.8zM9.7 15.5V8.5L15.8 12l-6.1 3.5z"/></svg>
+          </a>
+          <a href="#" class="p-2 rounded-xl bg-white/5 border border-white/10 transition hover:scale-105 hover:shadow-neon" aria-label="Website">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-slate-200"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z" stroke="currentColor"/><path d="M2 12h20M12 2c3 3 5 7.5 5 10s-2 7-5 10c-3-3-5-7.5-5-10s2-7 5-10z" stroke="currentColor"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // --- Static INR prices ---
+    const PRICES = {
+      BTC: 6300000, // ₹63,00,000
+      ETH: 320000,  // ₹3,20,000
+      USDT: 83.5,   // ₹83.50
+      DOGE: 11.32,  // ₹11.32
+    };
+
+    const INR = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 });
+    const NUM = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 8 });
+
+    // Update price cards just to ensure consistent formatting
+    document.getElementById('price-card-btc').textContent = INR.format(PRICES.BTC);
+    document.getElementById('price-card-eth').textContent = INR.format(PRICES.ETH);
+    document.getElementById('price-card-usdt').textContent = INR.format(PRICES.USDT);
+    document.getElementById('price-card-doge').textContent = INR.format(PRICES.DOGE);
+
+    // Crypto -> INR elements
+    const c2iCoin = document.getElementById('c2i-coin');
+    const c2iAmount = document.getElementById('c2i-amount');
+    const c2iResult = document.getElementById('c2i-result');
+
+    // INR -> Crypto elements
+    const i2cCoin = document.getElementById('i2c-coin');
+    const i2cAmount = document.getElementById('i2c-amount');
+    const i2cResult = document.getElementById('i2c-result');
+
+    function calcC2I() {
+      const coin = c2iCoin.value;
+      const amt = parseFloat(c2iAmount.value || '0');
+      const price = PRICES[coin];
+      const value = amt * price;
+      c2iResult.value = amt ? INR.format(value) : '';
+    }
+
+    function calcI2C() {
+      const coin = i2cCoin.value;
+      const amt = parseFloat(i2cAmount.value || '0');
+      const price = PRICES[coin];
+      const value = amt / price;
+      i2cResult.value = amt ? NUM.format(value) + ' ' + coin : '';
+    }
+
+    // Bind events for live updates
+    c2iCoin.addEventListener('change', calcC2I);
+    c2iAmount.addEventListener('input', calcC2I);
+    i2cCoin.addEventListener('change', calcI2C);
+    i2cAmount.addEventListener('input', calcI2C);
+
+    // Initialize empty
+    calcC2I();
+    calcI2C();
+  </script>
+</body>
+</html>
